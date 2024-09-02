@@ -5,14 +5,10 @@ import com.example.pj2_2024.Vozilo.Automobil;
 import com.example.pj2_2024.Vozilo.EBike;
 import com.example.pj2_2024.Vozilo.ETrotinet;
 import com.example.pj2_2024.Vozilo.Vozilo;
-import javafx.animation.Animation;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
-import javafx.util.Duration;
 
 import java.io.IOException;
 import java.net.URL;
@@ -20,10 +16,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class HelloController implements Initializable {
     private static final int BROJ_KOLONA = 20;
@@ -36,17 +30,41 @@ public class HelloController implements Initializable {
     private static GridPane pane;
     private static final SimpleDateFormat vFormatter = new SimpleDateFormat("dd.MM.yyyy.");
     private static final SimpleDateFormat iFormatter = new SimpleDateFormat("dd.MM.yyyy hh:mm");
-    private final ArrayList<Vozilo> vozila = new ArrayList<>();
-    private final ArrayList<Iznajmljivanje> iznajmljivanja = new ArrayList<>();
+    private final List<Vozilo> vozila = new ArrayList<>();
+    private List<Iznajmljivanje> iznajmljivanja = new ArrayList<>();
 
 
     @FXML
     private void onPokreniButtonClick() {
         try {
-            for (Iznajmljivanje iznajmljivanje : iznajmljivanja) {
-                iznajmljivanje.start();
-                iznajmljivanje.join();
+
+            // Group by date
+            Map<Date, List<Iznajmljivanje>> groupedByDate = iznajmljivanja.stream()
+                    .collect(Collectors.groupingBy(Iznajmljivanje::getDatumIznajmljivanja));
+
+            // Process each date group
+            for (Map.Entry<Date, List<Iznajmljivanje>> entry : groupedByDate.entrySet()) {
+                List<Iznajmljivanje> list = entry.getValue();
+
+                // Process each rental for the current date
+                for (Iznajmljivanje iznajmljivanje : list) {
+                    System.out.println("START BEFORE");
+                    iznajmljivanje.start();
+                }
+
+                for (Iznajmljivanje iznajmljivanje : list) {
+                    // Wait for the thread to complete
+                    iznajmljivanje.join();
+                    System.out.println("JOIN AFTER");
+                }
+
+                // Pause for 5 seconds after processing all rentals for a given date
+//                Thread.sleep(5000);
+
+                // Clear the map before processing the next group
+//                Platform.runLater(() -> pane.getChildren().removeAll());
             }
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -69,7 +87,7 @@ public class HelloController implements Initializable {
 
     public static void prikaziNaMapi(Iznajmljivanje iznajmljivanje) {
         pane.add(new Rectangle(21, 21, iznajmljivanje.getVozilo().getColor()), iznajmljivanje.getCurrentPos()[0], iznajmljivanje.getCurrentPos()[1]);
-    }   //NOT ON FX APP THREAD
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -111,11 +129,15 @@ public class HelloController implements Initializable {
                         line.get(1), searchVozila(line.get(2)), toIntArray(line.get(3), line.get(4)), toIntArray(line.get(5),
                         line.get(6)), Integer.parseInt(line.get(7)), line.get(8), line.get(9)));
             }
+            iznajmljivanja = iznajmljivanja.stream()
+                    .sorted(Comparator.comparing(Iznajmljivanje::getDatumIznajmljivanja))
+                    .collect(Collectors.toList());
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ParseException e) {
             e.printStackTrace();
         }
+
     }
 
     public int[] toIntArray(String string1, String string2) {
@@ -126,8 +148,8 @@ public class HelloController implements Initializable {
     }
 
     public Vozilo searchVozila(String id) {
-        for(int i = 0; i < vozila.size(); i++) {
-            if(id.equals(vozila.get(i).getId())) return vozila.get(i);
+        for (Vozilo vozilo : vozila) {
+            if (id.equals(vozilo.getId())) return vozilo;
         }
         return null;
     }
