@@ -5,10 +5,15 @@ import com.example.pj2_2024.Vozilo.Automobil;
 import com.example.pj2_2024.Vozilo.EBike;
 import com.example.pj2_2024.Vozilo.ETrotinet;
 import com.example.pj2_2024.Vozilo.Vozilo;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
+import javafx.util.Duration;
 
 import java.io.IOException;
 import java.net.URL;
@@ -22,6 +27,7 @@ import java.util.stream.Collectors;
 public class HelloController implements Initializable {
     private static final int BROJ_KOLONA = 20;
     private static final int BROJ_REDOVA = 20;
+    private static final double INTERVAL = 300;
     private static final String COMMA_DELIMITER = ",";
     private static final String V_CSV_PATH = "src/main/resources/com/example/pj2_2024/PJ2 - projektni zadatak 2024 - Prevozna sredstva.csv";
     private static final String I_CSV_PATH = "src/main/resources/com/example/pj2_2024/PJ2 - projektni zadatak 2024 - Iznajmljivanja.csv";
@@ -46,6 +52,11 @@ public class HelloController implements Initializable {
             for (Map.Entry<Date, List<Iznajmljivanje>> entry : groupedByDate.entrySet()) {
                 List<Iznajmljivanje> list = entry.getValue();
 
+                // Set up GridPane updating timeline
+                Timeline timeline = new Timeline(new KeyFrame(Duration.millis(INTERVAL), event -> updateGrid(list)));
+                timeline.setCycleCount(Animation.INDEFINITE);
+                timeline.play();
+
                 // Process each rental for the current date
                 for (Iznajmljivanje iznajmljivanje : list) {
                     System.out.println("START BEFORE");
@@ -58,6 +69,7 @@ public class HelloController implements Initializable {
                     System.out.println("JOIN AFTER");
                 }
 
+                timeline.stop();
                 // Pause for 5 seconds after processing all rentals for a given date
 //                Thread.sleep(5000);
 
@@ -152,5 +164,10 @@ public class HelloController implements Initializable {
             if (id.equals(vozilo.getId())) return vozilo;
         }
         return null;
+    }
+
+    public void updateGrid(List<Iznajmljivanje> iznajmljivanja) {
+        for(Iznajmljivanje iznajmljivanje : iznajmljivanja)
+            Platform.runLater(() -> prikaziNaMapi(iznajmljivanje));
     }
 }
