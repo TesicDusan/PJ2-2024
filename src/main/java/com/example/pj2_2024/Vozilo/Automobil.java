@@ -15,6 +15,9 @@ public class Automobil extends Vozilo {
         this.opis = opis;
     }
 
+
     @Override
     public Color getColor() { return CAR_COLOR; }
+    public String getOpis() { return opis; }
+    public Date getDatumNabavke() { return datumNabavke; }
 }

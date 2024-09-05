@@ -4,7 +4,7 @@ import javafx.scene.paint.Color;
 
 public class ETrotinet extends Vozilo {
     private static final Color SCOOTER_COLOR = Color.RED;
-    private int maxBrzina;
+    private final int maxBrzina;
 
     public ETrotinet(String id, String proizvodjac, String model, int cijenaNabavke, int maxBrzina) {
         super(id, proizvodjac, model, cijenaNabavke);
@@ -13,4 +13,5 @@ public class ETrotinet extends Vozilo {
 
     @Override
     public Color getColor() { return SCOOTER_COLOR; }
+    public int getMaxBrzina() { return maxBrzina; }
 }

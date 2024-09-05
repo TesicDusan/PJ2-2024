@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="660.0" prefWidth="750.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pj2_2024.VozilaController">
+   <children>
+      <TableView fx:id="automobili" layoutX="15.0" layoutY="15.0" prefHeight="200.0" prefWidth="720.0">
+        <columns>
+          <TableColumn fx:id="automobilId" prefWidth="87.0" text="Automobil" />
+          <TableColumn fx:id="automobilProizvodjac" prefWidth="99.0" text="Proizvodjac" />
+            <TableColumn fx:id="automobilModel" prefWidth="67.0" text="Model" />
+            <TableColumn fx:id="automobilCijena" prefWidth="127.0" text="Cijena Nabavke" />
+            <TableColumn fx:id="automobilBaterija" prefWidth="131.0" text="Nivo Baterije" />
+            <TableColumn fx:id="datumNabavke" prefWidth="131.0" text="Datum Nabavke" />
+            <TableColumn fx:id="opis" prefWidth="77.0" text="Opis" />
+        </columns>
+      </TableView>
+      <TableView fx:id="trotineti" layoutX="15.0" layoutY="230.0" prefHeight="200.0" prefWidth="720.0">
+        <columns>
+          <TableColumn fx:id="trotinetId" prefWidth="75.0" text="Trotinet" />
+          <TableColumn fx:id="trotinetProizvodjac" prefWidth="117.0" text="Proizvodjac" />
+            <TableColumn fx:id="trotinetModel" prefWidth="99.0" text="Model" />
+            <TableColumn fx:id="trotinetCijena" prefWidth="141.0" text="Cijena Nabavke" />
+            <TableColumn fx:id="trotinetBaterija" prefWidth="127.0" text="Nivo Baterije" />
+            <TableColumn fx:id="maxBrzina" prefWidth="160.0" text="Maksimalna Brzina" />
+        </columns>
+      </TableView>
+      <TableView fx:id="bicikli" layoutX="15.0" layoutY="445.0" prefHeight="200.0" prefWidth="720.0">
+        <columns>
+          <TableColumn fx:id="biciklId" prefWidth="75.0" text="Bicikl" />
+          <TableColumn fx:id="biciklProizvodjac" prefWidth="139.0" text="Proizvodjac" />
+            <TableColumn fx:id="biciklModel" prefWidth="113.0" text="Model" />
+            <TableColumn fx:id="biciklCijena" prefWidth="143.0" text="Cijena Nabavke" />
+            <TableColumn fx:id="biciklBaterija" prefWidth="150.0" text="Nivo Baterije" />
+            <TableColumn fx:id="domet" prefWidth="99.0" text="Domet" />
+        </columns>
+      </TableView>
+   </children>
+</AnchorPane>

@@ -13,4 +13,5 @@ public class EBike extends Vozilo {
 
     @Override
     public Color getColor() { return BIKE_COLOR; }
+    public int getDomet() { return domet; }
 }

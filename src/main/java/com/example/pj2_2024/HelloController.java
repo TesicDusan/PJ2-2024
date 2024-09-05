@@ -8,14 +8,18 @@ import com.example.pj2_2024.Vozilo.Vozilo;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -25,12 +29,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class HelloController implements Initializable {
+    private static final Object LOCK = new Object();
     private static final int BROJ_KOLONA = 20;
     private static final int BROJ_REDOVA = 20;
-    private static final double INTERVAL = 300;
+    private static final double INTERVAL = 50;
     private static final String COMMA_DELIMITER = ",";
-    private static final String V_CSV_PATH = "src/main/resources/com/example/pj2_2024/PJ2 - projektni zadatak 2024 - Prevozna sredstva.csv";
-    private static final String I_CSV_PATH = "src/main/resources/com/example/pj2_2024/PJ2 - projektni zadatak 2024 - Iznajmljivanja.csv";
+    private static final String V_CSV_NAME = "PJ2 - projektni zadatak 2024 - Prevozna sredstva.csv";
+    private static final String I_CSV_NAME = "PJ2 - projektni zadatak 2024 - Iznajmljivanja.csv";
     @FXML
     private VBox vbox;
     private static GridPane pane;
@@ -69,12 +74,12 @@ public class HelloController implements Initializable {
                     System.out.println("JOIN AFTER");
                 }
 
-                timeline.stop();
+                //timeline.stop();
                 // Pause for 5 seconds after processing all rentals for a given date
-//                Thread.sleep(5000);
+                //Thread.sleep(5000);
 
                 // Clear the map before processing the next group
-//                Platform.runLater(() -> pane.getChildren().removeAll());
+                //Platform.runLater(() -> pane.getChildren().removeAll());
             }
 
         } catch (InterruptedException e) {
@@ -84,17 +89,54 @@ public class HelloController implements Initializable {
 
     @FXML
     private void onSvaVozilaButtonClick() {
+        try {
+            FXMLLoader loader = new FXMLLoader(HelloController.class.getResource("vozila-view.fxml"));
+            Parent root = loader.load();
 
+            VozilaController controller = loader.getController();
+            controller.ucitajVozila(vozila);
+
+            Scene scene = new Scene(root);
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.setTitle("Vozila");
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
     private void onKvaroviButtonClick() {
+        try {
+            FXMLLoader loader = new FXMLLoader(HelloController.class.getResource("kvarovi-view.fxml"));
+            Parent root = loader.load();
 
+            KvaroviController controller = loader.getController();
+            controller.ucitajKvarove(vozila);
+
+            Scene scene = new Scene(root);
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.setTitle("Kvarovi");
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
     private void onPoslovanjeButtonClick() {
-
+        try {
+            FXMLLoader loader = new FXMLLoader(HelloController.class.getResource("poslovanje-view.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void prikaziNaMapi(Iznajmljivanje iznajmljivanje) {
@@ -103,6 +145,7 @@ public class HelloController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        //Napravi grid
         pane = new GridPane();
         for(int i = 0; i < BROJ_REDOVA; i++) {
             RowConstraints rowConstraint = new RowConstraints(21);
@@ -116,8 +159,9 @@ public class HelloController implements Initializable {
         VBox.setVgrow(pane, Priority.ALWAYS);
         vbox.getChildren().add(pane);
 
+        //Ucitaj vozila
         try {
-            List<List<String>> lines = Files.readAllLines(Paths.get(V_CSV_PATH)).stream()
+            List<List<String>> lines = Files.readAllLines(Paths.get(Objects.requireNonNull(HelloController.class.getResource(V_CSV_NAME)).toURI())).stream()
                     .map(line -> Arrays.asList(line.split(COMMA_DELIMITER))).toList();
             for(List<String> line : lines) {
                 if("automobil".equals(line.get(8))) vozila.add(new Automobil(line.get(0), line.get(1), line.get(2),
@@ -131,10 +175,13 @@ public class HelloController implements Initializable {
             e.printStackTrace();
         } catch (ParseException e) {
             e.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
         }
 
+        //Ucitaj iznajmljivanja
         try {
-            List<List<String>> lines = Files.readAllLines(Paths.get(I_CSV_PATH)).stream()
+            List<List<String>> lines = Files.readAllLines(Paths.get(Objects.requireNonNull(HelloController.class.getResource(I_CSV_NAME)).toURI())).stream()
                     .map(line -> Arrays.asList(line.split(COMMA_DELIMITER))).toList();
             for(List<String> line : lines) {
                 if (!line.equals(lines.get(0))) iznajmljivanja.add(new Iznajmljivanje(iFormatter.parse(line.get(0)),
@@ -147,6 +194,8 @@ public class HelloController implements Initializable {
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ParseException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
             e.printStackTrace();
         }
 
@@ -165,9 +214,10 @@ public class HelloController implements Initializable {
         }
         return null;
     }
-
     public void updateGrid(List<Iznajmljivanje> iznajmljivanja) {
         for(Iznajmljivanje iznajmljivanje : iznajmljivanja)
-            Platform.runLater(() -> prikaziNaMapi(iznajmljivanje));
+            prikaziNaMapi(iznajmljivanje);
     }
+
+    public static Object getLock() { return LOCK; }
 }
