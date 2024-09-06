@@ -5,15 +5,15 @@ import com.example.pj2_2024.Vozilo.EBike;
 import com.example.pj2_2024.Vozilo.ETrotinet;
 import com.example.pj2_2024.Vozilo.Vozilo;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 public class Kvar {
     private final String idVozila;
     private final String vrstaVozila;
-    private final LocalDateTime vrijeme;
+    private final Date vrijeme;
     private final String opis;
 
-    public Kvar(LocalDateTime vrijeme, String opis, Vozilo vozilo) {
+    public Kvar(Date vrijeme, String opis, Vozilo vozilo) {
         this.vrijeme = vrijeme;
         this.opis = opis;
         idVozila = vozilo.getId();
@@ -26,5 +26,5 @@ public class Kvar {
     public String getVrstaVozila() { return  vrstaVozila; }
     public String getIdVozila() { return idVozila; }
     public String getOpis() { return opis; }
-    public LocalDateTime getVrijeme() { return vrijeme; }
+    public Date getVrijeme() { return vrijeme; }
 }

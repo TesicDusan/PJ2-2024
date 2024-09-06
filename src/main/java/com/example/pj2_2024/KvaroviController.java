@@ -9,7 +9,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 public class KvaroviController {
@@ -21,7 +21,7 @@ public class KvaroviController {
     @FXML
     private TableColumn<Kvar, String> vrstaVozila;
     @FXML
-    private TableColumn<Kvar, LocalDateTime> vrijeme;
+    private TableColumn<Kvar, Date> vrijeme;
     @FXML
     private TableColumn<Kvar, String> opis;
 

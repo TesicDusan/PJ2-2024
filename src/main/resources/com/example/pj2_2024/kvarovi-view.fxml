@@ -3,15 +3,14 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.example.pj2_2024.KvaroviController">
     <TableView fx:id="kvaroviTable" layoutX="15.0" layoutY="15.0" prefHeight="370.0" prefWidth="570.0">
-      <columns>
-          <TableColumn fx:id="vrstaVozila" prefWidth="106.0" text="Vrsta Vozila"/>
-          <TableColumn fx:id="idVozila" prefWidth="95.0" text="ID"/>
-          <TableColumn fx:id="vrijeme" prefWidth="178.0" text="Datum"/>
-          <TableColumn fx:id="opis" prefWidth="190.0" text="Opis"/>
-      </columns>
+        <columns>
+            <TableColumn fx:id="vrstaVozila" prefWidth="106.0" text="Vrsta Vozila"/>
+            <TableColumn fx:id="idVozila" prefWidth="95.0" text="ID"/>
+            <TableColumn fx:id="vrijeme" prefWidth="178.0" text="Datum"/>
+            <TableColumn fx:id="opis" prefWidth="190.0" text="Opis"/>
+        </columns>
     </TableView>
 </AnchorPane>
