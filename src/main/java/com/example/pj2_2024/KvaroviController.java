@@ -25,7 +25,10 @@ public class KvaroviController {
     @FXML
     private TableColumn<Kvar, String> opis;
 
-
+    /**
+     * Metoda koja ucitava kvarove iz liste vozila i postavlja ih na tabelu.
+     * @param vozila lista vozila cije kvarove treba ucitati
+     */
     public void ucitajKvarove(List<Vozilo> vozila) {
 
         ObservableList<Kvar> kvarovi = FXCollections.observableArrayList();

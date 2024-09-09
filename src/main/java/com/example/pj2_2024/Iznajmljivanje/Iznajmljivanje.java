@@ -1,21 +1,18 @@
 package com.example.pj2_2024.Iznajmljivanje;
 
 import com.example.pj2_2024.HelloController;
+import com.example.pj2_2024.Korisnik.Korisnik;
 import com.example.pj2_2024.Kvar.Kvar;
-import com.example.pj2_2024.Vozilo.Automobil;
-import com.example.pj2_2024.Vozilo.EBike;
+import com.example.pj2_2024.Racun.Racun;
 import com.example.pj2_2024.Vozilo.Vozilo;
+import javafx.application.Platform;
 
-import java.io.*;
 import java.util.Date;
-import java.util.Properties;
 
 public class Iznajmljivanje extends Thread {
-    private static final String CONFIG_FILE = "config.properties";
-    private static int IZNAJMLJIVANJE_ID = 0;
     private static int DISCOUNT_BR = 0;
     private final Vozilo vozilo;
-    private final String korisnik;
+    private final Korisnik korisnik;
     private final Date datumIznajmljivanja;
     private final int[] startPos;
     private int[] currentPos;
@@ -26,7 +23,7 @@ public class Iznajmljivanje extends Thread {
     private boolean popust;
     private boolean siriDioGrada = false;
 
-    public Iznajmljivanje(Date datumIznajmljivanja, String korisnik, Vozilo vozilo, int[] startPos, int[] destPos,
+    public Iznajmljivanje(Date datumIznajmljivanja, Korisnik korisnik, Vozilo vozilo, int[] startPos, int[] destPos,
                           int trajanje, String kvar, String promocija) {
         this.datumIznajmljivanja = datumIznajmljivanja;
         this.korisnik = korisnik;
@@ -37,8 +34,6 @@ public class Iznajmljivanje extends Thread {
         this.trajanje = trajanje;
         this.kvar = "da".equals(kvar);
         this.promocija = "da".equals(promocija);
-
-        this.vozilo.addIznajmljivanje(this);
     }
 
     @Override
@@ -52,7 +47,7 @@ public class Iznajmljivanje extends Thread {
                 vozilo.addKvar(noviKvar);
                 trajanje = 0;
             } else {
-                int zadrzavanje = (int) (((double) (Math.abs(destPos[0] - currentPos[0]) + Math.abs(destPos[1] - currentPos[1])) / trajanje) * 1000);
+                int zadrzavanje = (int) (((double) trajanje / (Math.abs(destPos[0] - currentPos[0]) + Math.abs(destPos[1] - currentPos[1]))) * 1000);
 
                 try {
                     synchronized (HelloController.getLock()) {
@@ -66,6 +61,9 @@ public class Iznajmljivanje extends Thread {
                                 else if (currentPos[1] < destPos[1]) currentPos[1]++;
                                 else currentPos[1]--;
                                 vozilo.trosiBateriju();
+
+                                Platform.runLater(() -> HelloController.prikaziNaMapi(this));
+
                                 HelloController.getLock().wait(zadrzavanje);
                                 HelloController.getLock().notifyAll();
                             }
@@ -75,54 +73,20 @@ public class Iznajmljivanje extends Thread {
                     e.printStackTrace();
                 }
         }
-        generisiRacun();
+        Racun racun = new Racun(this);
+        HelloController.addRacun(racun);
+        racun.generisiRacun();
     }
 
-    public void generisiRacun() {
-        try {
-            File directory = new File(korisnik);
-            directory.mkdir();
-            File file = new File(directory, ++IZNAJMLJIVANJE_ID + ".txt");
-            if(file.exists())file.delete();
-            file.createNewFile();
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            double ukupno;
-
-            if (kvar) ukupno = 0;
-            else {
-                Properties properties = new Properties();
-                properties.load(Iznajmljivanje.class.getResourceAsStream(CONFIG_FILE));
-                double iznos;
-                if (vozilo instanceof Automobil)
-                    iznos = Integer.parseInt(properties.getProperty("CAR_UNIT_PRICE")) * trajanje
-                            * (siriDioGrada ? Double.parseDouble(properties.getProperty("DISTANCE_WIDE")) : Double.parseDouble(properties.getProperty("DISTANCE_NARROW")));
-                else if (vozilo instanceof EBike)
-                    iznos = Integer.parseInt(properties.getProperty("BIKE_UNIT_PRICE")) * trajanje
-                            * (siriDioGrada ? Double.parseDouble(properties.getProperty("DISTANCE_WIDE")) : Double.parseDouble(properties.getProperty("DISTANCE_NARROW")));
-                else iznos = Integer.parseInt(properties.getProperty("SCOOTER_UNIT_PRICE")) * trajanje
-                            * (siriDioGrada ? Double.parseDouble(properties.getProperty("DISTANCE_WIDE")) : Double.parseDouble(properties.getProperty("DISTANCE_NARROW")));
-                ukupno = iznos - (popust ? iznos * Double.parseDouble(properties.getProperty("DISCOUNT")) : 0) - (promocija ? iznos * Double.parseDouble(properties.getProperty("DISCOUNT_PROM")) : 0);
-            }
-            writer.write(datumIznajmljivanja + "\n"
-                    + "Korisnik: " + korisnik + "\n"
-                    + "Vozilo: " + vozilo.getId() + "\n"
-                    + "Popust: " + (popust ? "da" : "ne") + "\n"
-                    + "Promocija: " + (promocija ? "da" : "ne") + "\n"
-                    + "Kvar: " + (kvar ? "da" : "ne") + "\n"
-                    + "Lokacija preuzimanja: " + startPos[0] + "," + startPos[1] + "\n"
-                    + "Lokacija ostavljanja: " + currentPos[0] + "," + currentPos[1] + "\n"
-                    + "Trajanje iznajmljivanja: " + trajanje + "s\n"
-                    + "Cijena: " + ukupno + "KM\n");
-            writer.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
     public int[] getCurrentPos() { return currentPos; }
+    public int[] getStartPos() { return startPos; }
     public Vozilo getVozilo() { return vozilo; }
-
+    public Korisnik getKorisnik() { return korisnik; }
+    public boolean isSiriDioGrada() { return siriDioGrada; }
+    public boolean isKvar() { return kvar; }
+    public boolean isPopust() { return popust; }
+    public boolean isPromocija() { return promocija; }
+    public int getTrajanje() { return trajanje; }
     public Date getDatumIznajmljivanja() {
         return datumIznajmljivanja;
     }

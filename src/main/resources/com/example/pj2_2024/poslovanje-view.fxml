@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.example.pj2_2024.PoslovanjeController"
-            prefHeight="400.0" prefWidth="600.0">
-
+<AnchorPane prefHeight="223.0" prefWidth="250.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pj2_2024.PoslovanjeController">
+   <children>
+      <Button layoutX="32.0" layoutY="32.0" mnemonicParsing="false" onAction="#onDnevniButtonClick" prefWidth="187.0" text="Dnevni izvještaj" />
+      <Button layoutX="32.0" layoutY="97.0" mnemonicParsing="false" onAction="#onSumarniButtonClick" prefWidth="187.0" text="Sumarni izvještaj" />
+      <Button layoutX="32.0" layoutY="160.0" mnemonicParsing="false" onAction="#onVozilaButtonClick" prefWidth="187.0" text="Vozila sa najviše prihoda" />
+   </children>
 </AnchorPane>

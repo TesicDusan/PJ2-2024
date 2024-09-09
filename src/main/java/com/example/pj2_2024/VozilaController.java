@@ -66,6 +66,10 @@ public class VozilaController {
     @FXML
     private TableColumn<ETrotinet, Integer> maxBrzina;
 
+    /**
+     * Metoda koja ucitava sva vozila koja treba prikazati u tabeli i postavlja tabelu.
+     * @param vozila lista vozila koja treba ucitati
+     */
     public void ucitajVozila(List<Vozilo> vozila) {
         ObservableList<Automobil> automobils = FXCollections.observableArrayList();
         ObservableList<EBike> eBikes = FXCollections.observableArrayList();

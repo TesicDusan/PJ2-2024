@@ -1,12 +1,8 @@
 package com.example.pj2_2024;
 
 import javafx.application.Application;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.layout.GridPane;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -18,6 +14,8 @@ public class HelloApplication extends Application {
         Scene scene = new Scene(fxmlLoader.load(), 600, 500);
         stage.setTitle("Hello!");
         stage.setScene(scene);
+        stage.setWidth(1050);
+        stage.setHeight(600);
         stage.show();
     }
 

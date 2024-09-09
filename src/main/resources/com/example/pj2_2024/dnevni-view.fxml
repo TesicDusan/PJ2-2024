@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pj2_2024.DnevniController">
+   <children>
+      <TableView fx:id="table" layoutX="15.0" layoutY="15.0" prefHeight="370.0" prefWidth="870.0">
+        <columns>
+          <TableColumn fx:id="datum" prefWidth="115.0" text="Datum" />
+          <TableColumn fx:id="prihod" prefWidth="95.0" text="Prihod" />
+            <TableColumn fx:id="popust" prefWidth="111.0" text="Popust" />
+            <TableColumn fx:id="promocije" prefWidth="130.0" text="Promocija" />
+            <TableColumn fx:id="iznosVoznji" prefWidth="136.0" text="Iznos" />
+            <TableColumn fx:id="odrzavanje" prefWidth="144.0" text="Odrzavanje" />
+            <TableColumn fx:id="popravke" prefWidth="138.0" text="Popravke" />
+        </columns>
+      </TableView>
+   </children>
+</AnchorPane>

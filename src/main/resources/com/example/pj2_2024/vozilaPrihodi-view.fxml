@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="200.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pj2_2024.VozilaPrihodiController">
+   <children>
+      <Label layoutX="35.0" layoutY="20.0" text="Automobil:" />
+      <Label layoutX="35.0" layoutY="60.0" text="Bicikl:" />
+      <Label layoutX="35.0" layoutY="100.0" text="Trotinet:" />
+      <Label fx:id="automobilL" layoutX="166.0" layoutY="20.0" text="Label" />
+      <Label fx:id="biciklL" layoutX="166.0" layoutY="60.0" text="Label" />
+      <Label fx:id="trotinetL" layoutX="166.0" layoutY="100.0" text="Label" />
+   </children>
+</AnchorPane>

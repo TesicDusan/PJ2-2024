@@ -5,7 +5,7 @@ import javafx.scene.paint.Color;
 import java.util.Date;
 
 public class Automobil extends Vozilo {
-    private static final Color CAR_COLOR = Color.BLACK;
+    private static final Color CAR_COLOR = Color.GREEN;
     private final Date datumNabavke;
     private final String opis;
 

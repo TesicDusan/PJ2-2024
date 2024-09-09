@@ -1,13 +1,13 @@
 package com.example.pj2_2024;
 
 import com.example.pj2_2024.Iznajmljivanje.Iznajmljivanje;
+import com.example.pj2_2024.Korisnik.Korisnik;
+import com.example.pj2_2024.Racun.Racun;
 import com.example.pj2_2024.Vozilo.Automobil;
 import com.example.pj2_2024.Vozilo.EBike;
 import com.example.pj2_2024.Vozilo.ETrotinet;
 import com.example.pj2_2024.Vozilo.Vozilo;
-import javafx.animation.Animation;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -15,9 +15,10 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -33,9 +34,13 @@ public class HelloController implements Initializable {
     private static final int BROJ_KOLONA = 20;
     private static final int BROJ_REDOVA = 20;
     private static final double INTERVAL = 50;
+    private static final int V_BROJ_ATRIBUTA = 9;
+    private static final int I_BROJ_ATRIBUTA = 10;
+
     private static final String COMMA_DELIMITER = ",";
     private static final String V_CSV_NAME = "PJ2 - projektni zadatak 2024 - Prevozna sredstva.csv";
     private static final String I_CSV_NAME = "PJ2 - projektni zadatak 2024 - Iznajmljivanja.csv";
+
     @FXML
     private VBox vbox;
     private static GridPane pane;
@@ -43,43 +48,44 @@ public class HelloController implements Initializable {
     private static final SimpleDateFormat iFormatter = new SimpleDateFormat("dd.MM.yyyy hh:mm");
     private final List<Vozilo> vozila = new ArrayList<>();
     private List<Iznajmljivanje> iznajmljivanja = new ArrayList<>();
+    private static List<Racun> racuni = new ArrayList<>();
 
 
+    /**
+     * Metoda koja pokrece izvrsavanje simulacije.
+     */
     @FXML
     private void onPokreniButtonClick() {
         try {
 
-            // Group by date
+            // Grupisanje po datumu
             Map<Date, List<Iznajmljivanje>> groupedByDate = iznajmljivanja.stream()
                     .collect(Collectors.groupingBy(Iznajmljivanje::getDatumIznajmljivanja));
 
-            // Process each date group
+            // Izvrsavanje simulacije za svaki datum
             for (Map.Entry<Date, List<Iznajmljivanje>> entry : groupedByDate.entrySet()) {
                 List<Iznajmljivanje> list = entry.getValue();
 
-                // Set up GridPane updating timeline
-                Timeline timeline = new Timeline(new KeyFrame(Duration.millis(INTERVAL), event -> updateGrid(list)));
+                /*// Postavljanje Timeline objekta za azuriranje GridPane objekta
+                Timeline timeline = new Timeline(new KeyFrame(Duration.millis(INTERVAL), event -> Platform.runLater(() -> updateGrid(list))));
                 timeline.setCycleCount(Animation.INDEFINITE);
-                timeline.play();
+                timeline.play();*/
 
-                // Process each rental for the current date
+                // Pokretanje svakog iznajmljivanja za trenutni datum
                 for (Iznajmljivanje iznajmljivanje : list) {
-                    System.out.println("START BEFORE");
                     iznajmljivanje.start();
                 }
 
                 for (Iznajmljivanje iznajmljivanje : list) {
-                    // Wait for the thread to complete
+                    // Cekanje na tredove
                     iznajmljivanje.join();
-                    System.out.println("JOIN AFTER");
                 }
-
                 //timeline.stop();
-                // Pause for 5 seconds after processing all rentals for a given date
-                //Thread.sleep(5000);
+                // Pauza 5 sekundi nakon zavrsetka simulacije jednog datuma
+                Thread.sleep(5000);
 
-                // Clear the map before processing the next group
-                //Platform.runLater(() -> pane.getChildren().removeAll());
+                // Ciscenje mape prije pokretanja nove simulacije
+                Platform.runLater(() -> pane.getChildren().removeAll());
             }
 
         } catch (InterruptedException e) {
@@ -87,6 +93,9 @@ public class HelloController implements Initializable {
         }
     }
 
+    /**
+     * Metoda koja otvara novi prozor na kome ce biti prikazana sva ucitana vozila.
+     */
     @FXML
     private void onSvaVozilaButtonClick() {
         try {
@@ -106,6 +115,9 @@ public class HelloController implements Initializable {
         }
     }
 
+    /**
+     * Metoda koja otvara novi prozor na kome ce bit prikazani svi kvarovi koji su se dogodili tokom simulacije.
+     */
     @FXML
     private void onKvaroviButtonClick() {
         try {
@@ -125,6 +137,9 @@ public class HelloController implements Initializable {
         }
     }
 
+    /**
+     * Metoda koja otvara novi prozor na kome ce biti prikazane opcije poslovanja.
+     */
     @FXML
     private void onPoslovanjeButtonClick() {
         try {
@@ -139,12 +154,23 @@ public class HelloController implements Initializable {
         }
     }
 
+    /**
+     * Metoda koja prikazuje lokaciju iznajmljivanja na mapi.
+     * @param iznajmljivanje iznajmljivanje ciju lokaciju treba prikazati.
+     */
     public static void prikaziNaMapi(Iznajmljivanje iznajmljivanje) {
-        pane.add(new Rectangle(21, 21, iznajmljivanje.getVozilo().getColor()), iznajmljivanje.getCurrentPos()[0], iznajmljivanje.getCurrentPos()[1]);
+            Rectangle rectangle = new Rectangle(40, 20, iznajmljivanje.getVozilo().getColor());
+            Text text = new Text(iznajmljivanje.getVozilo().getId() + "-" + iznajmljivanje.getVozilo().getNivoBaterije() + "%");
+            StackPane stackPane = new StackPane();
+            stackPane.getChildren().addAll(rectangle, text);
+            pane.add(stackPane, iznajmljivanje.getCurrentPos()[0], iznajmljivanje.getCurrentPos()[1]);
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        //Napravi direktorij u koji ce biti smjesteni racuni
+        File file = new File("Racuni");
+        file.mkdir();
         //Napravi grid
         pane = new GridPane();
         for(int i = 0; i < BROJ_REDOVA; i++) {
@@ -152,7 +178,7 @@ public class HelloController implements Initializable {
             pane.getRowConstraints().add(rowConstraint);
         }
         for(int i = 0; i < BROJ_KOLONA; i++) {
-            ColumnConstraints columnConstraint = new ColumnConstraints(21);
+            ColumnConstraints columnConstraint = new ColumnConstraints(41);
             pane.getColumnConstraints().add(columnConstraint);
         }
         pane.setGridLinesVisible(true);
@@ -164,12 +190,15 @@ public class HelloController implements Initializable {
             List<List<String>> lines = Files.readAllLines(Paths.get(Objects.requireNonNull(HelloController.class.getResource(V_CSV_NAME)).toURI())).stream()
                     .map(line -> Arrays.asList(line.split(COMMA_DELIMITER))).toList();
             for(List<String> line : lines) {
-                if("automobil".equals(line.get(8))) vozila.add(new Automobil(line.get(0), line.get(1), line.get(2),
-                        vFormatter.parse(line.get(3)), Integer.parseInt(line.get(4)), line.get(7)));
-                else if("bicikl".equals(line.get(8))) vozila.add(new EBike(line.get(0), line.get(1), line.get(2),
-                        Integer.parseInt(line.get(4)), Integer.parseInt(line.get(5))));
-                else if("trotinet".equals(line.get(8))) vozila.add(new ETrotinet(line.get(0), line.get(1), line.get(2),
-                        Integer.parseInt(line.get(4)), Integer.parseInt(line.get(6))));
+                if(provjeriVozilo(line)) {
+                    if ("automobil".equals(line.get(8))) vozila.add(new Automobil(line.get(0), line.get(1), line.get(2),
+                            vFormatter.parse(line.get(3)), Integer.parseInt(line.get(4)), line.get(7)));
+                    else if ("bicikl".equals(line.get(8))) vozila.add(new EBike(line.get(0), line.get(1), line.get(2),
+                            Integer.parseInt(line.get(4)), Integer.parseInt(line.get(5))));
+                    else if ("trotinet".equals(line.get(8)))
+                        vozila.add(new ETrotinet(line.get(0), line.get(1), line.get(2),
+                                Integer.parseInt(line.get(4)), Integer.parseInt(line.get(6))));
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -184,8 +213,8 @@ public class HelloController implements Initializable {
             List<List<String>> lines = Files.readAllLines(Paths.get(Objects.requireNonNull(HelloController.class.getResource(I_CSV_NAME)).toURI())).stream()
                     .map(line -> Arrays.asList(line.split(COMMA_DELIMITER))).toList();
             for(List<String> line : lines) {
-                if (!line.equals(lines.get(0))) iznajmljivanja.add(new Iznajmljivanje(iFormatter.parse(line.get(0)),
-                        line.get(1), searchVozila(line.get(2)), toIntArray(line.get(3), line.get(4)), toIntArray(line.get(5),
+                if (!line.equals(lines.get(0)) && provjeriIznajmljivanje(line)) iznajmljivanja.add(new Iznajmljivanje(iFormatter.parse(line.get(0)),
+                        new Korisnik(line.get(1), Korisnik.generisiStranac()), searchVozila(line.get(2)), toIntArray(line.get(3), line.get(4)), toIntArray(line.get(5),
                         line.get(6)), Integer.parseInt(line.get(7)), line.get(8), line.get(9)));
             }
             iznajmljivanja = iznajmljivanja.stream()
@@ -201,6 +230,12 @@ public class HelloController implements Initializable {
 
     }
 
+    /**
+     * Pomocna metoda koja se koristi da ucitane vrijednosti koordinata pretvori u niz dva int-a.
+     * @param string1 x koordinata
+     * @param string2 y koordinata
+     * @return niz dva int-a koji predstavlja koordinate
+     */
     public int[] toIntArray(String string1, String string2) {
         int[] tmp = new int[2];
         tmp[0] = Integer.parseInt(string1.replace("\"", ""));
@@ -208,16 +243,72 @@ public class HelloController implements Initializable {
         return tmp;
     }
 
+    /**
+     * Pomocna metoda koja provjerava da li se vozilo sa zadanim identifikatorom nalazi u listi vozila.
+     * @param id identifikator vozila
+     * @return objekat vozila ukoliko se ono nalazi u listi
+     */
     public Vozilo searchVozila(String id) {
         for (Vozilo vozilo : vozila) {
             if (id.equals(vozilo.getId())) return vozilo;
         }
         return null;
     }
-    public void updateGrid(List<Iznajmljivanje> iznajmljivanja) {
-        for(Iznajmljivanje iznajmljivanje : iznajmljivanja)
-            prikaziNaMapi(iznajmljivanje);
-    }
+/*    public void updateGrid(List<Iznajmljivanje> iznajmljivanja) {
+        Platform.runLater(() -> {
+            for(Iznajmljivanje iznajmljivanje : iznajmljivanja)
+                prikaziNaMapi(iznajmljivanje);
+        });
+    }*/
 
     public static Object getLock() { return LOCK; }
+    public static void addRacun(Racun racun) { racuni.add(racun); }
+    public static List<Racun> getRacuni() { return racuni; }
+
+    /**
+     * Pomocna metoda koja provjerava da li ucitana linija fajla ima odgovarajuci broj atributa i preskace prvu liniju fajla.
+     * @param line linija fajla ciji se sadrzaj provjerava
+     * @return true ako je linija validna, false ako nije
+     */
+    public boolean provjeriVozilo(List<String> line) {
+        return line.size() == V_BROJ_ATRIBUTA && searchVozila(line.get(0)) == null;
+    }
+
+    /**
+     * Pomocna metoda koja provjerava da li ucitana linija fajla ima odgovarajuci broj atributa i preskace prvu liniju fajla.
+     * @param line linija fajla ciji se sadrzaj provjerava
+     * @return true ako je linija validna, false ako nije
+     */
+    public boolean provjeriIznajmljivanje(List<String> line) {
+        //Provjera broja atributa
+        if(line.size() != I_BROJ_ATRIBUTA) {
+            System.out.println("Pogresan broj atributa pri ucitavanju iznajmljivanja!");
+            return false;
+        }
+        //Provjera dvostrukog iznajmljivanja
+        for (Iznajmljivanje iznajmljivanje : iznajmljivanja.stream().filter(i -> {
+            try {
+                return i.getDatumIznajmljivanja().equals(iFormatter.parse(line.get(0)));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            } return false;
+        }).toList()) if (iznajmljivanje.getVozilo().getId().equals(line.get(2))) {
+            System.out.println("Dvostruko iznajmljivanje istog vozila!");
+            return false;
+        }
+        //Provjera opsega koordinata
+        for(int i = 3; i <= 6; i++) {
+            int j = Integer.parseInt(line.get(i).replace("\"", ""));
+            if(j < 0 || j > 19) {
+                System.out.println("Koordinate van opsega!");
+                return false;
+            }
+        }
+        //Provjera postojanja vozila
+        if(searchVozila(line.get(2)) == null) {
+            System.out.println("Neposojece vozilo!");
+            return false;
+        }
+        return true;
+    }
 }

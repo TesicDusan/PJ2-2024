@@ -1,22 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.shape.*?>
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.Button?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pj2_2024.HelloController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="1050.0" prefHeight="500.0" prefWidth="1050.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pj2_2024.HelloController">
    <children>
-      <Button layoutX="187.0" layoutY="455.0" mnemonicParsing="false" onAction="#onPokreniButtonClick" prefHeight="15.0" prefWidth="75.0" text="Pokreni" />
-      <Button layoutX="479.0" layoutY="106.0" mnemonicParsing="false" onAction="#onSvaVozilaButtonClick" prefWidth="91.0" text="Sva vozila" />
-      <Button layoutX="479.0" layoutY="209.0" mnemonicParsing="false" onAction="#onKvaroviButtonClick" prefWidth="91.0" text="Kvarovi" />
-      <Button layoutX="479.0" layoutY="320.0" mnemonicParsing="false" onAction="#onPoslovanjeButtonClick" text="Poslovanje" />
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="217.0" layoutX="121.0" layoutY="121.0" stroke="BLACK" strokeType="INSIDE" width="217.0" />
-      <VBox fx:id="vbox" layoutX="14.0" layoutY="14.0" prefHeight="420.0" prefWidth="420.0" />
+      <Button layoutX="392.0" layoutY="455.0" mnemonicParsing="false" onAction="#onPokreniButtonClick" prefHeight="15.0" prefWidth="75.0" text="Pokreni" />
+      <Button layoutX="880.0" layoutY="105.0" mnemonicParsing="false" onAction="#onSvaVozilaButtonClick" prefWidth="100.0" text="Sva vozila" />
+      <Button layoutX="880.0" layoutY="210.0" mnemonicParsing="false" onAction="#onKvaroviButtonClick" prefWidth="100.0" text="Kvarovi" />
+      <Button layoutX="880.0" layoutY="320.0" mnemonicParsing="false" onAction="#onPoslovanjeButtonClick" prefWidth="100.0" text="Poslovanje" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="218.0" layoutX="220.0" layoutY="120.0" stroke="BLACK" strokeType="INSIDE" width="418.0" />
+      <VBox fx:id="vbox" layoutX="14.0" layoutY="14.0" prefHeight="400.0" prefWidth="800.0" />
    </children>
 </AnchorPane>

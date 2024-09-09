@@ -7,4 +7,5 @@ module com.example.pj2_2024 {
     exports com.example.pj2_2024;
     exports com.example.pj2_2024.Vozilo;
     exports com.example.pj2_2024.Kvar;
+    exports com.example.pj2_2024.Izvjestaj;
 }
