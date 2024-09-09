@@ -3,19 +3,18 @@ package com.example.pj2_2024;
 import com.example.pj2_2024.Iznajmljivanje.Iznajmljivanje;
 import com.example.pj2_2024.Korisnik.Korisnik;
 import com.example.pj2_2024.Racun.Racun;
+import com.example.pj2_2024.Simulacija.Simulacija;
 import com.example.pj2_2024.Vozilo.Automobil;
 import com.example.pj2_2024.Vozilo.EBike;
 import com.example.pj2_2024.Vozilo.ETrotinet;
 import com.example.pj2_2024.Vozilo.Vozilo;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.layout.*;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -30,10 +29,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class HelloController implements Initializable {
-    private static final Object LOCK = new Object();
     private static final int BROJ_KOLONA = 20;
     private static final int BROJ_REDOVA = 20;
-    private static final double INTERVAL = 50;
     private static final int V_BROJ_ATRIBUTA = 9;
     private static final int I_BROJ_ATRIBUTA = 10;
 
@@ -43,6 +40,8 @@ public class HelloController implements Initializable {
 
     @FXML
     private VBox vbox;
+    @FXML
+    private Label datum;
     private static GridPane pane;
     private static final SimpleDateFormat vFormatter = new SimpleDateFormat("dd.MM.yyyy.");
     private static final SimpleDateFormat iFormatter = new SimpleDateFormat("dd.MM.yyyy hh:mm");
@@ -56,41 +55,11 @@ public class HelloController implements Initializable {
      */
     @FXML
     private void onPokreniButtonClick() {
-        try {
+        Map<Date, List<Iznajmljivanje>> grupisanaIznajmljivanja = iznajmljivanja.stream()
+                .collect(Collectors.groupingBy(Iznajmljivanje::getDatumIznajmljivanja));
 
-            // Grupisanje po datumu
-            Map<Date, List<Iznajmljivanje>> groupedByDate = iznajmljivanja.stream()
-                    .collect(Collectors.groupingBy(Iznajmljivanje::getDatumIznajmljivanja));
-
-            // Izvrsavanje simulacije za svaki datum
-            for (Map.Entry<Date, List<Iznajmljivanje>> entry : groupedByDate.entrySet()) {
-                List<Iznajmljivanje> list = entry.getValue();
-
-                /*// Postavljanje Timeline objekta za azuriranje GridPane objekta
-                Timeline timeline = new Timeline(new KeyFrame(Duration.millis(INTERVAL), event -> Platform.runLater(() -> updateGrid(list))));
-                timeline.setCycleCount(Animation.INDEFINITE);
-                timeline.play();*/
-
-                // Pokretanje svakog iznajmljivanja za trenutni datum
-                for (Iznajmljivanje iznajmljivanje : list) {
-                    iznajmljivanje.start();
-                }
-
-                for (Iznajmljivanje iznajmljivanje : list) {
-                    // Cekanje na tredove
-                    iznajmljivanje.join();
-                }
-                //timeline.stop();
-                // Pauza 5 sekundi nakon zavrsetka simulacije jednog datuma
-                Thread.sleep(5000);
-
-                // Ciscenje mape prije pokretanja nove simulacije
-                Platform.runLater(() -> pane.getChildren().removeAll());
-            }
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        Simulacija simulacija = new Simulacija(grupisanaIznajmljivanja, this);
+        simulacija.pokreni();
     }
 
     /**
@@ -154,18 +123,6 @@ public class HelloController implements Initializable {
         }
     }
 
-    /**
-     * Metoda koja prikazuje lokaciju iznajmljivanja na mapi.
-     * @param iznajmljivanje iznajmljivanje ciju lokaciju treba prikazati.
-     */
-    public static void prikaziNaMapi(Iznajmljivanje iznajmljivanje) {
-            Rectangle rectangle = new Rectangle(40, 20, iznajmljivanje.getVozilo().getColor());
-            Text text = new Text(iznajmljivanje.getVozilo().getId() + "-" + iznajmljivanje.getVozilo().getNivoBaterije() + "%");
-            StackPane stackPane = new StackPane();
-            stackPane.getChildren().addAll(rectangle, text);
-            pane.add(stackPane, iznajmljivanje.getCurrentPos()[0], iznajmljivanje.getCurrentPos()[1]);
-    }
-
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         //Napravi direktorij u koji ce biti smjesteni racuni
@@ -200,11 +157,7 @@ public class HelloController implements Initializable {
                                 Integer.parseInt(line.get(4)), Integer.parseInt(line.get(6))));
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
+        } catch (IOException | ParseException | URISyntaxException e) {
             e.printStackTrace();
         }
 
@@ -254,14 +207,9 @@ public class HelloController implements Initializable {
         }
         return null;
     }
-/*    public void updateGrid(List<Iznajmljivanje> iznajmljivanja) {
-        Platform.runLater(() -> {
-            for(Iznajmljivanje iznajmljivanje : iznajmljivanja)
-                prikaziNaMapi(iznajmljivanje);
-        });
-    }*/
 
-    public static Object getLock() { return LOCK; }
+    public Label getDatum() { return datum; }
+    public static GridPane getPane() { return pane; }
     public static void addRacun(Racun racun) { racuni.add(racun); }
     public static List<Racun> getRacuni() { return racuni; }
 

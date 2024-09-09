@@ -5,11 +5,14 @@ import com.example.pj2_2024.Korisnik.Korisnik;
 import com.example.pj2_2024.Kvar.Kvar;
 import com.example.pj2_2024.Racun.Racun;
 import com.example.pj2_2024.Vozilo.Vozilo;
-import javafx.application.Platform;
 
 import java.util.Date;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
 public class Iznajmljivanje extends Thread {
+    private static final Object LOCK = new Object();
+    private CyclicBarrier barrier;
     private static int DISCOUNT_BR = 0;
     private final Vozilo vozilo;
     private final Korisnik korisnik;
@@ -38,6 +41,7 @@ public class Iznajmljivanje extends Thread {
 
     @Override
     public void run() {
+        try {
             if(++DISCOUNT_BR == 10) {
                 popust = true;
                 DISCOUNT_BR = 0;
@@ -49,34 +53,34 @@ public class Iznajmljivanje extends Thread {
             } else {
                 int zadrzavanje = (int) (((double) trajanje / (Math.abs(destPos[0] - currentPos[0]) + Math.abs(destPos[1] - currentPos[1]))) * 1000);
 
-                try {
-                    synchronized (HelloController.getLock()) {
+                    synchronized (LOCK) {
                         while (currentPos[0] != destPos[0] || currentPos[1] != destPos[1]) {
                             if((currentPos[0] < 5 || currentPos[0] > 14) && (currentPos[1] < 4 || currentPos[1] > 14)) siriDioGrada = true;
                             if (vozilo.baterijaPrazna()) vozilo.napuniBateriju();
                             else {
-                                // Update position based on current and destination positions
                                 if (currentPos[0] < destPos[0]) currentPos[0]++;
                                 else if (currentPos[0] > destPos[0]) currentPos[0]--;
                                 else if (currentPos[1] < destPos[1]) currentPos[1]++;
                                 else currentPos[1]--;
                                 vozilo.trosiBateriju();
 
-                                Platform.runLater(() -> HelloController.prikaziNaMapi(this));
-
-                                HelloController.getLock().wait(zadrzavanje);
-                                HelloController.getLock().notifyAll();
+                                LOCK.wait(zadrzavanje);
+                                LOCK.notifyAll();
                             }
                         }
                     }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            }
+            barrier.await();
+        } catch (InterruptedException | BrokenBarrierException e) {
+            e.printStackTrace();
         }
+
         Racun racun = new Racun(this);
         HelloController.addRacun(racun);
         racun.generisiRacun();
     }
+
+    public void setBarrier(CyclicBarrier barrier) { this.barrier = barrier; }
 
     public int[] getCurrentPos() { return currentPos; }
     public int[] getStartPos() { return startPos; }
