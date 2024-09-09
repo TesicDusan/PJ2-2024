@@ -7,12 +7,8 @@ import com.example.pj2_2024.Racun.Racun;
 import com.example.pj2_2024.Vozilo.Vozilo;
 
 import java.util.Date;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
-
 public class Iznajmljivanje extends Thread {
     private static final Object LOCK = new Object();
-    private CyclicBarrier barrier;
     private static int DISCOUNT_BR = 0;
     private final Vozilo vozilo;
     private final Korisnik korisnik;
@@ -55,7 +51,7 @@ public class Iznajmljivanje extends Thread {
 
                     synchronized (LOCK) {
                         while (currentPos[0] != destPos[0] || currentPos[1] != destPos[1]) {
-                            if((currentPos[0] < 5 || currentPos[0] > 14) && (currentPos[1] < 4 || currentPos[1] > 14)) siriDioGrada = true;
+                            if((currentPos[0] < 5 || currentPos[0] > 14) || (currentPos[1] < 4 || currentPos[1] > 14)) siriDioGrada = true;
                             if (vozilo.baterijaPrazna()) vozilo.napuniBateriju();
                             else {
                                 if (currentPos[0] < destPos[0]) currentPos[0]++;
@@ -65,13 +61,12 @@ public class Iznajmljivanje extends Thread {
                                 vozilo.trosiBateriju();
 
                                 LOCK.wait(zadrzavanje);
-                                LOCK.notifyAll();
+                                LOCK.notify();
                             }
                         }
                     }
             }
-            barrier.await();
-        } catch (InterruptedException | BrokenBarrierException e) {
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
@@ -80,8 +75,7 @@ public class Iznajmljivanje extends Thread {
         racun.generisiRacun();
     }
 
-    public void setBarrier(CyclicBarrier barrier) { this.barrier = barrier; }
-
+    public static Object getLock() { return LOCK; }
     public int[] getCurrentPos() { return currentPos; }
     public int[] getStartPos() { return startPos; }
     public Vozilo getVozilo() { return vozilo; }
